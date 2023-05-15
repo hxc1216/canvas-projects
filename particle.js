@@ -1,26 +1,26 @@
 function getRandom(min, max, fixedLen = 2) {
-  if (min > max) {
-    const temp = max;
-    max = min;
-    min = temp;
+  const minValue = Math.min(min, max);
+  const maxValue = Math.max(min, max);
+
+  let randomNumber;
+
+  if (minValue >= 0 && maxValue > 0) {
+    randomNumber = Number((Math.random() * (maxValue - minValue) + minValue).toFixed(fixedLen));
+  } else if (minValue < 0 && maxValue >= 0) {
+    randomNumber = Number((Math.random() * (maxValue - minValue) + minValue).toFixed(fixedLen));
+  } else if (minValue < 0 && maxValue <= 0) {
+    randomNumber = Number(0 - (Math.random() * Math.abs(maxValue - minValue) + Math.abs(maxValue)).toFixed(fixedLen));
   }
 
-  if (min >= 0 && max > 0) {
-    return Number((Math.random() * (max - min) + min).toFixed(fixedLen));
-  } else if (min < 0 && max >= 0) {
-    return Number((Math.random() * (max - min) + min).toFixed(fixedLen));
-  } else if (min < 0 && max <= 0) {
-    return Number(0 - (Math.random() * Math.abs(max - min) + Math.abs(max)).toFixed(fixedLen));
-  }
+  return randomNumber;
 }
 
 class Point {
-  constructor(canvas, ctx, config = { color: "#fff", radio: 6 }) {
+  constructor(canvas, ctx, config = { color: "#fff", radius: 6 }) {
     this.canvas = canvas;
     this.ctx = ctx;
     // 获取配置
     this.config = config;
-    console.log("🚀🚀🚀 ~ file: index.js:23 ~ Point ~ constructor ~ this.config :", this.config )
 
     // 利用随机数随机生成一个坐标
     this.x = getRandom(0, this.canvas.width);
@@ -36,27 +36,27 @@ class Point {
   draw() {
     if (this.lastDrawTime) {
       // 距离上一次动画的间隔
-      const distance = (Date.now() - this.lastDrawTime) / 1000;
+      const elapsedTime = (Date.now() - this.lastDrawTime) / 1000;
 
       //   间隔乘以运动速度，计算出移动的距离
-      let xDis = distance * this.xSpeed,
-        yDis = distance * this.ySpeed;
+      let xDis = elapsedTime * this.xSpeed,
+        yDis = elapsedTime * this.ySpeed;
 
       // 获取移动后的点坐标x,y
       let x = this.x + xDis,
         y = this.y + yDis;
 
       // 判断点是否超出边界，超出时改变方向 反向运动
-      if (x > this.canvas.width - this.radio / 2) {
-        x = this.canvas.width - this.radio / 2;
+      if (x > this.canvas.width - this.config.radius / 2) {
+        x = this.canvas.width - this.config.radius / 2;
         this.xSpeed = -this.xSpeed;
       } else if (x < 0) {
         x = 0;
         this.xSpeed = -this.xSpeed;
       }
 
-      if (y > this.canvas.height - this.radio / 2) {
-        y = this.canvas.height - this.radio / 2;
+      if (y > this.canvas.height - this.config.radius / 2) {
+        y = this.canvas.height - this.config.radius / 2;
         this.ySpeed = -this.ySpeed;
       } else if (y < 0) {
         y = 0;
@@ -70,7 +70,7 @@ class Point {
 
     // 根据坐标、半径画出 点
     this.ctx.beginPath();
-    this.ctx.arc(this.x, this.y, this.config.radio * devicePixelRatio, 0, 2 * Math.PI);
+    this.ctx.arc(this.x, this.y, this.config.radius * devicePixelRatio, 0, 2 * Math.PI);
     this.ctx.fillStyle = this.config.color;
     this.ctx.fill();
 
@@ -79,7 +79,7 @@ class Point {
 }
 
 class Graph {
-  constructor(containerId, config = { bgColor: "#000", pColor: "#fff", lineWidth: 1, pNumbers: 40, maxDis: 200, pointConfig: {} }) {
+  constructor(containerId, config = { bgColor: "#000", lineWidth: 1, pNumbers: 40, maxDis: 200, pointConfig: {} }) {
     // 获取容器
     const container = document.querySelector(containerId);
     // 创建canvas并设置样式
@@ -97,7 +97,7 @@ class Graph {
 
     // 实例化点 生成一个集合
     this.points = new Array(40).fill(0).map(() => new Point(this.canvas, this.ctx, this.config.pointConfig));
-    // this.draw();
+    
   }
 
   /** 画点连线 */
