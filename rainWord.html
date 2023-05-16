@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      #canvas {
+        position: fixed;
+        left: 0;
+        top: 0;
+        background: #000000;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      const canvas = document.querySelector("#canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+
+      const fontSize = 12 * devicePixelRatio;
+
+      // ctx.fillText("hello world",300,300);
+
+      const columns = Math.floor(canvas.width / fontSize);
+
+      const charIndex = new Array(columns).fill(0);
+
+      function draw() {
+
+        ctx.fillStyle = `rgba(0,0,0,0.06)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#b97611";
+        ctx.font = `${fontSize}px 'Roboto Mono' `;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        charIndex.forEach((item, index) => {
+          const x = index * fontSize;
+          const y = item * fontSize;
+          ctx.fillText(getRandomText(), x, y);
+          charIndex[index]++;
+
+          if(y > canvas.height && Math.random() > 0.99){
+            charIndex[index] = 0;
+          }
+
+        });
+        requestAnimationFrame(() => {
+          draw();
+        });
+      }
+
+      draw();
+
+      function getRandomText() {
+        // const texts = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9"]
+        const texts = "abcdefghijklmnopqrstuvwxyz0123456789";
+        const index = Math.floor(Math.random() * texts.length);
+        return texts[index];
+      }
+    </script>
+  </body>
+</html>
